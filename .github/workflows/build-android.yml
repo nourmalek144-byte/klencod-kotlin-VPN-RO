@@ -1,3 +1,4 @@
+
 name: Build Android Kotlin APK
 
 on:
@@ -28,6 +29,11 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      - name: Set up Gradle 8.14
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.14'
+
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
         with:
@@ -40,17 +46,11 @@ jobs:
           set -o pipefail
           LOG="$RUNNER_TEMP/klencod-gradle.log"
 
-          if [ -f gradlew ]; then
-            echo "✅ Using Gradle Wrapper (gradlew)"
-            chmod +x gradlew || true
-            ./gradlew --no-daemon --build-cache --parallel \
-              :app:assembleDebug -x lint -x test 2>&1 | tee "$LOG"
-          else
-            echo "⚠️ gradlew غير موجود — استخدام gradle من النظام"
-            echo "ℹ️ هذا شائع في المشاريع المستوردة من الخارج"
-            gradle --no-daemon --build-cache --parallel \
-              :app:assembleDebug -x lint -x test 2>&1 | tee "$LOG"
-          fi
+          echo "Using system Gradle:"
+          gradle --version
+
+          gradle --no-daemon --build-cache --parallel \
+            :app:assembleDebug -x lint -x test 2>&1 | tee "$LOG"
 
       - name: Print compiler diagnostics on failure
         if: failure()
@@ -58,8 +58,10 @@ jobs:
         run: |
           LOG="$RUNNER_TEMP/klencod-gradle.log"
           echo "===== Klencod compiler diagnostics ====="
+
           if [[ -f "$LOG" ]]; then
-            grep -E 'error:|warning:|FAILED|Compilation failed|BUILD FAILED|What went wrong' "$LOG" | tail -n 120 || true
+            grep -E 'error:|warning:|FAILED|Compilation failed|BUILD FAILED|What went wrong' \
+              "$LOG" | tail -n 120 || true
           else
             echo "Gradle output file was not created."
           fi
