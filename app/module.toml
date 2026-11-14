@@ -13,7 +13,7 @@ java = ["src/main/java"]
 res = ["src/main/res"]
 
 [android]
-namespace = "com.vpvro.ro"
+namespace = "com.friends.privatevpn"
 compileSdk = 34
 minSdk = 24
 targetSdk = 28
