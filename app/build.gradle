@@ -37,6 +37,9 @@ android {
     sourceSets {
         main {
             java.srcDirs = ['src/main/java']
+            // Exclude the obsolete duplicate implementation left by earlier patches.
+            // The canonical application package is com.friends.privatevpn.
+            java.exclude 'com/vpvro/ro/**'
             res.srcDirs = ['src/main/res']
             assets.srcDirs = ['src/main/assets']
         }
